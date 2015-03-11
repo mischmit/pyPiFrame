@@ -1,16 +1,22 @@
 import glob
 import fnmatch
 import os
+import sys
+import random
 import SimpleHTTPServer
 from BaseHTTPServer import HTTPServer
 from BaseHTTPServer import BaseHTTPRequestHandler
 import datetime
-import string
 import json
+import time
 
 allowedExtensions = ('.jpg', '.jpeg', '.JPEG', 'JPG')
+ignore_dir = "@eaDir"
 start_time = datetime.datetime.now()
-interval = 5
+interval = 10
+
+def get_metadata(file):
+	return {"url": file, "time": time.ctime(os.path.getctime(file))}
 
 def get_current_image():
 	curIndex = (datetime.datetime.now() - start_time).seconds / interval % len(files)
@@ -20,10 +26,23 @@ def get_current_image():
 def get_files(path):
 	matches = []
 	for root, dirnames, filenames in os.walk(path):
+		try:
+			dirnames.remove(ignore_dir)
+		except ValueError:
+			pass
 		matches = matches + [os.path.join(root, filename) for filename in filenames if filename.endswith(allowedExtensions)]
 	return [m.replace("\\", "/") for m in matches]
 
-files = get_files('example_images')
+if len(sys.argv) == 2:
+	path = sys.argv[1]
+else:
+	path = "example_images"
+
+print os.path.join(os.getcwd(), path)
+files = get_files(path)
+print "Everyday im shuffelling ..."
+random.shuffle(files)
+print len(files), "Files"
 
 class TimedHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	def do_GET(self):
@@ -31,7 +50,10 @@ class TimedHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			self.send_response(200)
 			self.end_headers()
 			current_image = get_current_image()
-			self.wfile.write(json.dumps({"url": current_image, "duration": interval}))
+
+			metadata = get_metadata(current_image)
+			metadata["duration"] = interval
+			self.wfile.write(json.dumps(metadata))
 		elif self.path == "/":
 			self.send_response(200)
 			self.end_headers()

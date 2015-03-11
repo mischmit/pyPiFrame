@@ -7,20 +7,25 @@ var currentImage = null;
 
 var getNextImage = function(){
 	$.getJSON("metadata.json").done(function(result){
+		var nextImage = result;
 
-		if(currentImage !== null)
+		if(currentImage == null)
 		{
-			$("#display").css("background-image", "url('" + currentImage + "')");
+			currentImage = nextImage;
+			getNextImage();
 		}
 
-		var nextImage = result.url;
+		$("#caption").text(currentImage.time);
+
+		$("#display").css("background-image", "url('" + currentImage.url + "')");
+
 		// Set the url at the next div
 
-		$("#cache").attr( "src", nextImage );
+		$("#cache").attr( "src", nextImage.url );
 
-		currentImage = nextImage;
 		// Set timeout for next call
-		setTimeout(getNextImage, result.duration * 1000);
+		setTimeout(getNextImage, currentImage.duration * 1000);
+		currentImage = nextImage;
 	});
 }	
 
@@ -28,7 +33,11 @@ getNextImage();
 
 	</script>
 </head>
-	<div id="display" style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-size: contain; background-position: center; background-repeat: no-repeat; transition: all 2s ease-in;"></div>
+<body>
+	<div id="display" style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-size: contain; background-position: center; background-repeat: no-repeat; transition: all 2s ease-in;">
+		<div id="caption" style="color: white; text-align: center; vertical-align: bottom;">Hallo</div>
+	</div>
+
 	<img id="cache" style="display: none;">
 </body>
 </html>
