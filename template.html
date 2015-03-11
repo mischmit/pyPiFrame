@@ -2,6 +2,15 @@
 <head>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript">
+$(document).ready(function(){
+	if (document.body.webkitRequestFullScreen) {
+	  window.addEventListener('click', function(e) {
+	    if (e.target.type != 'text' && e.target.type != 'password') {
+	      document.body.webkitRequestFullScreen();
+	    }
+	  }, false);
+	}
+});
 
 var currentImage = null;
 
@@ -34,7 +43,7 @@ getNextImage();
 	</script>
 </head>
 <body>
-	<div id="display" style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-size: contain; background-position: center; background-repeat: no-repeat; transition: all 2s ease-in;">
+	<div id="display" style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-size: cover; background-position: center; background-repeat: no-repeat; transition: all 2s ease-in;">
 		<div id="caption" style="color: white; text-align: center; vertical-align: bottom;">Hallo</div>
 	</div>
 
