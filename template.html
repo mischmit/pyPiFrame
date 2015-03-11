@@ -1,8 +1,34 @@
 <html>
 <head>
-	<meta http-equiv="refresh" content="${refresh_count}">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript">
+
+var currentImage = null;
+
+var getNextImage = function(){
+	$.getJSON("metadata.json").done(function(result){
+
+		if(currentImage !== null)
+		{
+			$("#display").css("background-image", "url('" + currentImage + "')");
+		}
+
+		var nextImage = result.url;
+		// Set the url at the next div
+
+		$("#cache").attr( "src", nextImage );
+
+		currentImage = nextImage;
+		// Set timeout for next call
+		setTimeout(getNextImage, result.duration * 1000);
+	});
+}	
+
+getNextImage();
+
+	</script>
 </head>
-	<div style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-image: url('${image_src}'); background-size: contain; background-position: center; background-repeat: no-repeat;">
-	</div>
+	<div id="display" style="position: absolute; top:0px; left: 0px; right:0px; bottom:0px; background-size: contain; background-position: center; background-repeat: no-repeat; transition: all 2s ease-in;"></div>
+	<img id="cache" style="display: none;">
 </body>
 </html>
